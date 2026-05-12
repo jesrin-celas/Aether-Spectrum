@@ -1,4 +1,4 @@
-![Python](https://img.shields.io/badge/Python-3.12-blue)  ![HTML](https://img.shields.io/badge/HTML-5-orange)
+![Python](https://img.shields.io/badge/Python-3.12-blue)  ![HTML](https://img.shields.io/badge/HTML-5-orange) ![Arduino](https://img.shields.io/badge/Arduino-ESP32-green) ![ESP32](https://img.shields.io/badge/ESP32-IoT-red)
 # AETHER // SPECTRUM
 
 A cinematic real-time radar-style wireless telemetry dashboard for ESP32.
