@@ -1,3 +1,6 @@
+
+***MAKE SURE TO INSTALL ALL THE REQUIRED LIBRARIES BEFORE UPLOADING***
+
 1)  After uploading the code, turn on wifi in your mobile and look for "AETHER_RADAR".
 2)  Password is 12345678
 3)  After connecting, open your browser and type the url http://192.168.4.1
