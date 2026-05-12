@@ -92,4 +92,12 @@ Geolocation is optional and processed locally inside the browser.
 
 ---
 # Screenshots 
-## Mobile View ![Mobile UI](Image-1.jpeg)
+
+```html
+<h2 align="center">Mobile View</h2>
+
+<p align="center">
+  <img src="Image-2.jpeg" width="40%">
+</p>
+```
+
