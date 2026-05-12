@@ -91,3 +91,5 @@ This project does NOT:
 Geolocation is optional and processed locally inside the browser.
 
 ---
+# Screenshots 
+## Mobile View ![Mobile UI](Image-1.jpeg)
