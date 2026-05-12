@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>AETHER // SPECTRUM</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Syne+Mono&family=Orbitron:wght@400;600;900&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
+:root{
+  --g:#00ffe5;
+  --g2:#00b4ff;
+  --w:#ffb300;
+  --d:#ff3a5c;
+  --bl:#2196ff;
+  --pr:#b47aff;
+  --bg:#000608;
+  --bg2:#010c12;
+  --panel:rgba(0,20,32,0.7);
+  --border:rgba(0,255,229,0.08);
+  --border-bright:rgba(0,255,229,0.22);
+  --tx:#8ecfc4;
+  --tx-dim:rgba(120,200,185,0.45);
+  --fn:'Syne Mono',monospace;
+  --ft:'Orbitron',sans-serif;
+  --fh:'Space Grotesk',sans-serif;
+  --glow:0 0 20px rgba(0,255,229,0.15);
+}
+
+html,body{
+  background:var(--bg);
+  height:100%;
+  overflow:hidden;
+}
+
+body{
+  font-family:var(--fn);
+  color:var(--tx);
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+
+/* ─── NOISE OVERLAY ─── */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:1000;
+  opacity:.4;
+}
+
+/* ─── AMBIENT GLOW ─── */
+body::after{
+  content:'';
+  position:fixed;
+  width:600px;height:600px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(0,180,255,0.04) 0%, transparent 70%);
+  top:50%;left:50%;
+  transform:translate(-50%,-60%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ─── TOPBAR ─── */
+#tb{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 16px;
+  background:rgba(0,8,14,0.95);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  z-index:10;
+  backdrop-filter:blur(20px);
+  position:relative;
+}
+
+#tb::after{
+  content:'';
+  position:absolute;
+  bottom:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg, transparent 0%, var(--g) 30%, var(--g2) 70%, transparent 100%);
+  opacity:0.3;
+}
+
+#logo{
+  font-family:var(--ft);
+  font-size:11px;
+  font-weight:900;
+  color:var(--g);
+  letter-spacing:5px;
+  text-shadow:0 0 15px rgba(0,255,229,0.6), 0 0 40px rgba(0,255,229,0.2);
+  display:flex;align-items:center;gap:8px;
+}
+
+#logo-dot{
+  width:8px;height:8px;
+  background:var(--g);
+  clip-path:polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  animation:spin 4s linear infinite;
+  box-shadow:0 0 10px var(--g);
+}
+
+@keyframes spin{to{transform:rotate(360deg);}}
+
+#tb-r{display:flex;align-items:center;gap:12px;}
+
+.pill{
+  display:flex;align-items:center;gap:5px;
+  padding:3px 10px;
+  border-radius:2px;
+  border:1px solid var(--border-bright);
+  background:rgba(0,255,229,0.04);
+  font-size:8px;letter-spacing:1.5px;
+  color:var(--tx-dim);
+}
+
+.dot{
+  width:5px;height:5px;
+  border-radius:50%;
+  background:var(--g);
+  box-shadow:0 0 8px var(--g);
+  animation:bk 1.8s ease-in-out infinite;
+}
+
+@keyframes bk{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.3;transform:scale(0.7);}}
+
+#ck{
+  font-family:var(--ft);
+  font-size:9px;
+  color:var(--g);
+  letter-spacing:2px;
+  opacity:.8;
+}
+
+/* ─── RADAR ─── */
+#rs{
+  position:relative;
+  background:var(--bg);
+  flex-shrink:0;
+}
+
+#ra{
+  position:relative;
+  width:100%;
+  padding-bottom:80%;
+  overflow:hidden;
+}
+
+canvas{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;
+}
+
+#nl{
+  position:absolute;top:0;left:0;
+  width:100%;height:100%;
+  pointer-events:none;
+}
+
+/* ─── NODES ─── */
+.nd{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  transition:left 3.5s cubic-bezier(0.4,0,0.2,1), top 3.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.nc{
+  border-radius:50%;
+  position:relative;
+  z-index:2;
+  animation:np 3s ease-in-out infinite;
+}
+
+@keyframes np{0%,100%{transform:scale(1);}50%{transform:scale(1.5);}}
+
+.nr{
+  position:absolute;
+  border-radius:50%;
+  border:1px solid;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  animation:nra 3s ease-out infinite;
+}
+
+@keyframes nra{
+  0%{transform:translate(-50%,-50%) scale(1);opacity:.5;}
+  100%{transform:translate(-50%,-50%) scale(4);opacity:0;}
+}
+
+/* ─── LABELS — now just a tiny type badge ─── */
+.lb{
+  position:absolute;
+  pointer-events:none;
+  transform:translate(7px,-50%);
+  transition:left 3.5s cubic-bezier(0.4,0,0.2,1), top 3.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.lb-badge{
+  font-size:6px;
+  font-family:var(--ft);
+  letter-spacing:.8px;
+  padding:1px 4px;
+  border-radius:2px;
+  border:1px solid;
+  opacity:.75;
+  white-space:nowrap;
+}
+
+/* ─── NODE DETAIL POPUP ─── */
+#nd-popup{
+  position:absolute;
+  background:rgba(0,6,14,0.96);
+  border:1px solid rgba(0,255,229,0.25);
+  border-radius:6px;
+  padding:10px 14px;
+  pointer-events:none;
+  z-index:50;
+  min-width:130px;
+  max-width:160px;
+  backdrop-filter:blur(16px);
+  box-shadow:0 0 30px rgba(0,255,229,0.1), 0 8px 32px rgba(0,0,0,0.6);
+  transform:translate(12px,-50%);
+  opacity:0;
+  transition:opacity .2s ease, transform .2s ease;
+}
+
+#nd-popup.visible{
+  opacity:1;
+  transform:translate(16px,-50%);
+}
+
+#nd-popup::before{
+  content:'';
+  position:absolute;
+  left:-5px;top:50%;transform:translateY(-50%);
+  border-top:4px solid transparent;
+  border-bottom:4px solid transparent;
+  border-right:5px solid rgba(0,255,229,0.2);
+}
+
+#nd-popup .p-type{
+  font-size:7px;
+  letter-spacing:2px;
+  font-family:var(--ft);
+  opacity:.5;
+  margin-bottom:4px;
+}
+
+#nd-popup .p-name{
+  font-family:var(--fh);
+  font-size:11px;
+  font-weight:600;
+  color:#d0fff8;
+  word-break:break-all;
+  margin-bottom:5px;
+  line-height:1.3;
+}
+
+#nd-popup .p-rssi{
+  font-size:9px;
+  font-family:var(--ft);
+  font-weight:600;
+  margin-bottom:2px;
+}
+
+#nd-popup .p-bar{
+  display:flex;align-items:flex-end;gap:2px;height:10px;margin-top:4px;
+}
+
+#nd-popup .p-br{
+  width:4px;border-radius:1px;
+}
+
+/* ─── CENTER TEXT ─── */
+#of{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-family:var(--ft);
+  font-size:7px;
+  color:var(--tx-dim);
+  letter-spacing:3px;
+  animation:bk 2s ease-in-out infinite;
+  pointer-events:none;
+  margin-top:30px;
+}
+
+/* ─── SCAN PROGRESS ─── */
+#sp{
+  padding:5px 16px;
+  background:rgba(0,8,14,0.88);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  flex-shrink:0;
+}
+
+#sp-lbl{font-size:7px;color:var(--tx-dim);letter-spacing:2px;white-space:nowrap;}
+
+#sp-tr{
+  flex:1;height:2px;
+  background:rgba(0,255,229,0.06);
+  border-radius:0;
+  overflow:hidden;
+  position:relative;
+}
+
+#sp-fl{
+  height:100%;
+  background:linear-gradient(90deg, var(--g2), var(--g));
+  width:0%;
+  transition:width .12s linear;
+  box-shadow:0 0 8px var(--g);
+}
+
+#sp-cd{font-size:7px;color:var(--g);min-width:16px;text-align:right;letter-spacing:1px;}
+
+/* ─── STATS ROW ─── */
+#sr{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background:var(--border);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+
+.sc{
+  background:var(--bg2);
+  padding:8px 0 7px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+
+.sc::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:50%;transform:translateX(-50%);
+  width:24px;height:1px;
+  background:var(--g);
+  opacity:.3;
+}
+
+.sv{
+  font-family:var(--ft);
+  font-size:16px;
+  font-weight:900;
+  color:var(--g);
+  text-shadow:0 0 12px rgba(0,255,229,0.5);
+  line-height:1;
+}
+
+.sl{
+  font-size:6px;
+  color:var(--tx-dim);
+  letter-spacing:1.5px;
+  margin-top:3px;
+}
+
+/* ─── SECTION HEADERS ─── */
+.sh{
+  padding:7px 16px;
+  font-family:var(--ft);
+  font-size:6px;
+  letter-spacing:3px;
+  color:var(--tx-dim);
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  display:flex;align-items:center;gap:8px;
+}
+
+.sh::before{
+  content:'';
+  width:12px;height:1px;
+  background:var(--g);
+  opacity:.5;
+}
+
+/* ─── DEVICE LIST ─── */
+#dw{flex:1;overflow:auto;scrollbar-width:none;}
+#dw::-webkit-scrollbar{display:none;}
+
+.dr{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;
+  border-bottom:1px solid rgba(0,255,229,0.04);
+  background:var(--bg2);
+  position:relative;
+  overflow:hidden;
+  transition:background .15s;
+}
+
+.dr::before{
+  content:'';
+  position:absolute;
+  left:0;top:0;bottom:0;width:2px;
+  opacity:0;
+  transition:opacity .15s;
+}
+
+.dr:active{background:rgba(0,255,229,0.03);}
+
+.di{
+  font-size:14px;
+  flex-shrink:0;
+  width:20px;
+  text-align:center;
+  opacity:.85;
+}
+
+.dn{flex:1;min-width:0;}
+
+.dnm{
+  font-family:var(--fh);
+  font-size:9px;
+  font-weight:500;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#c8f0ea;
+}
+
+.dtp{
+  font-size:6px;
+  color:var(--tx-dim);
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  margin-top:2px;
+}
+
+.dr-r{
+  display:flex;flex-direction:column;
+  align-items:flex-end;gap:3px;
+  flex-shrink:0;
+}
+
+.db{display:flex;align-items:flex-end;gap:1.5px;height:12px;}
+
+.dbr{
+  width:3px;
+  border-radius:1px;
+  transition:background .3s;
+}
+
+.dv{font-size:7px;font-weight:600;letter-spacing:.5px;}
+
+/* ─── SIGNAL KEY ─── */
+#kw{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:var(--border);
+  border-top:1px solid var(--border);
+}
+
+.kc{
+  background:var(--bg2);
+  padding:8px 14px;
+  display:flex;align-items:center;gap:7px;
+}
+
+.kd{
+  width:7px;height:7px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.kl{font-size:8px;color:var(--tx-dim);}
+
+/* ─── SCAN FLASH ─── */
+@keyframes scanFlash{
+  0%{opacity:0;}
+  30%{opacity:.08;}
+  100%{opacity:0;}
+}
+
+.scan-flash{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at center, var(--g) 0%, transparent 70%);
+  animation:scanFlash 0.6s ease-out forwards;
+  pointer-events:none;
+}
+
+#footer{
+  height:28px;
+  flex-shrink:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:7px;
+  letter-spacing:2px;
+
+  color:rgba(120,200,185,0.4);
+
+  border-top:1px solid rgba(0,255,229,0.06);
+
+  background:rgba(0,8,14,0.96);
+
+  font-family:var(--ft);
+}
+
+</style>
+
+<!-- TOPBAR -->
+<div id="tb">
+  <div id="logo">
+    <div id="logo-dot"></div>
+    AETHER
+  </div>
+  <div id="tb-r">
+    <div class="pill">
+      <div class="dot"></div>
+      SPECTRUM
+    </div>
+    <span id="ck">--:--:--</span>
+  </div>
+</div>
+
+<!-- RADAR -->
+<div id="rs">
+  <div id="ra">
+    <canvas id="cv"></canvas>
+    <div id="nl"></div>
+    <div id="nd-popup">
+      <div class="p-type" id="pp-type">WI-FI</div>
+      <div class="p-name" id="pp-name">—</div>
+      <div class="p-rssi" id="pp-rssi">— dBm</div>
+      <div class="p-bar" id="pp-bar"></div>
+    </div>
+    <div id="of">SCANNING…</div>
+  </div>
+</div>
+
+<!-- SCAN PROGRESS -->
+<div id="sp">
+  <span id="sp-lbl">SWEEP</span>
+  <div id="sp-tr"><div id="sp-fl"></div></div>
+  <span id="sp-cd">5s</span>
+</div>
+
+<!-- STATS -->
+<div id="sr">
+  <div class="sc"><div class="sv" id="st">0</div><div class="sl">TOTAL</div></div>
+  <div class="sc"><div class="sv" id="sw">0</div><div class="sl">WI-FI</div></div>
+  <div class="sc"><div class="sv" id="sb2">0</div><div class="sl">BLE</div></div>
+  <div class="sc"><div class="sv" id="ss">0</div><div class="sl">STRONG</div></div>
+</div>
+
+<!-- DEVICE LIST -->
+<div class="sh">DETECTED SIGNALS</div>
+<div id="dw"><div id="em" style="padding:30px;text-align:center;font-size:9px;letter-spacing:2px;color:var(--tx-dim);">AWAITING SWEEP…</div></div>
+
+<!-- SIGNAL KEY -->
+<div class="sh" style="margin-top:1px;">SIGNAL LEGEND</div>
+<div id="kw">
+  <div class="kc"><div class="kd" style="background:#00ffe5;box-shadow:0 0 6px #00ffe5"></div><div class="kl">STRONG &gt; -50 dBm</div></div>
+  <div class="kc"><div class="kd" style="background:#ffb300;box-shadow:0 0 6px #ffb300"></div><div class="kl">MEDIUM -70 dBm</div></div>
+  <div class="kc"><div class="kd" style="background:#ff3a5c;box-shadow:0 0 6px #ff3a5c"></div><div class="kl">WEAK &lt; -70 dBm</div></div>
+  <div class="kc"><div class="kd" style="background:#2196ff;border-radius:2px"></div><div class="kl">ᯤ WI-FI NODE</div></div>
+  <div class="kc"><div class="kd" style="background:#b47aff;border-radius:2px"></div><div class="kl">ᛒ BLE DEVICE</div></div>
+  <div class="kc" style="grid-column:1/-1;padding-bottom:12px;justify-content:center;">
+    <div class="kl" style="font-size:7px;opacity:.4;letter-spacing:1px;">CENTER = STRONGER SIGNAL</div>
+  </div>
+</div>
+<div id="footer">
+  © 2026 @jesrin_celas • ALL RIGHTS RESERVED
+</div>
+<script>
+
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const nl = document.getElementById('nl');
+
+let W, H, cx, cy, mr, sw = 0, frame = 0;
+
+function rsz() {
+  const a = document.getElementById('ra');
+  W = a.clientWidth;
+  H = a.clientHeight;
+  cv.width = W;
+  cv.height = H;
+  cx = W / 2;
+  cy = H / 2;
+  mr = Math.min(W, H) * 0.41;
+}
+rsz();
+window.addEventListener('resize', rsz);
+
+// Particles
+const particles = Array.from({length: 30}, () => ({
+  x: Math.random() * 2 * Math.PI,
+  r: Math.random() * 0.95,
+  speed: (Math.random() * 0.3 + 0.05) * (Math.random() > 0.5 ? 1 : -1),
+  size: Math.random() * 1.2 + 0.3,
+  alpha: Math.random() * 0.4 + 0.1
+}));
+
+function draw() {
+ ctx.fillStyle = 'rgba(0,0,0,0.08)';
+  ctx.fillRect(0,0,W,H);
+
+  // Background gradient
+  const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, mr * 1.2);
+  bg.addColorStop(0, 'rgba(0,20,30,0.4)');
+  bg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid rings with labels
+  for (let i = 1; i <= 4; i++) {
+    const r = mr * (i / 4);
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    if (i === 4) {
+      ctx.strokeStyle = 'rgba(0,255,229,0.2)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+    } else {
+      ctx.strokeStyle = `rgba(0,255,229,${0.04 + i * 0.015})`;
+      ctx.lineWidth = 0.5;
+      ctx.setLineDash([2, 6]);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Distance label
+    const dBm = Math.round(-30 - (i / 4) * 65);
+    ctx.fillStyle = 'rgba(0,255,229,0.2)';
+    ctx.font = `7px 'Syne Mono',monospace`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(dBm + '', cx + r + 3, cy);
+  }
+
+  // Cross hair lines
+  ctx.setLineDash([2, 8]);
+  ctx.strokeStyle = 'rgba(0,255,229,0.06)';
+  ctx.lineWidth = 0.5;
+  for (let a = 0; a < 8; a++) {
+    const ag = a * Math.PI / 4;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(ag) * mr * 1.1, cy + Math.sin(ag) * mr * 1.1);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // Floating particles on radar
+  particles.forEach(p => {
+    p.x += p.speed * 0.008;
+    const px = cx + Math.cos(p.x) * mr * p.r;
+    const py = cy + Math.sin(p.x) * mr * p.r;
+    ctx.beginPath();
+    ctx.arc(px, py, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,255,229,${p.alpha * 0.3})`;
+    ctx.fill();
+  });
+
+  // Sweep gradient (multi-layer)
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(sw);
+  const sg = ctx.createConicalGradient ? null : null;
+for (let a = 0; a < 120; a++) {
+
+  ctx.beginPath();
+
+  ctx.moveTo(0, 0);
+
+  ctx.arc(
+    0,
+    0,
+    mr,
+    (a - 1) * Math.PI / 180,
+    a * Math.PI / 180
+  );
+
+  ctx.closePath();
+
+  const t = 1 - (a / 120);
+
+  ctx.fillStyle = `
+    rgba(
+      0,
+      255,
+      229,
+      ${Math.pow(t, 2.8) * 0.22}
+    )
+  `;
+
+  ctx.fill();
+}
+  // Sweep edge glow
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(Math.cos(0) * mr, Math.sin(0) * mr);
+  ctx.strokeStyle = 'rgba(0,255,229,0.6)';
+  ctx.lineWidth = 1.5;
+  // Random radar flicker
+  if(Math.random() > 0.985){
+
+    ctx.beginPath();
+
+    ctx.arc(
+      0,
+      0,
+      mr * (0.3 + Math.random() * 0.7),
+      0,
+      Math.PI * 2
+    );
+
+    ctx.strokeStyle = 'rgba(0,255,229,0.05)';
+    ctx.lineWidth = 2;
+
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Center hub
+  // Outer ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(0,255,229,0.12)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Inner glow
+  const hub = ctx.createRadialGradient(cx, cy, 0, cx, cy, 22);
+  hub.addColorStop(0, 'rgba(0,255,229,0.15)');
+  hub.addColorStop(1, 'rgba(0,255,229,0)');
+  ctx.beginPath();
+  ctx.arc(cx, cy, 22, 0, Math.PI * 2);
+  ctx.fillStyle = hub;
+  ctx.fill();
+
+  // Icon
+  ctx.font = '16px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = '#00ffe5';
+  ctx.shadowBlur = 15;
+  ctx.fillStyle = '#00ffe5';
+  ctx.fillText('📡', cx, cy + 1);
+  ctx.shadowBlur = 0;
+
+  // Corner brackets
+  const bl = 12, boff = mr * 1.02;
+  [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([sx,sy]) => {
+    const bx = cx + sx * boff, by = cy + sy * boff;
+    ctx.strokeStyle = 'rgba(0,255,229,0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(bx - sx*bl, by);
+    ctx.lineTo(bx, by);
+    ctx.lineTo(bx, by - sy*bl);
+    ctx.stroke();
+  });
+}
+
+let sweepVelocity = 0.012;
+let sweepTarget = 0.018;
+
+function loop() {
+
+  // Organic speed variation
+  sweepVelocity += (sweepTarget - sweepVelocity) * 0.02;
+
+  // Random micro drift
+  if(frame % 120 === 0){
+    sweepTarget = 0.010 + Math.random() * 0.012;
+  }
+
+  sw = (sw + sweepVelocity) % (Math.PI * 2);
+
+  frame++;
+
+  draw();
+
+  requestAnimationFrame(loop);
+}
+loop();
+
+// ─── DATA ───
+const A = {}, NE = {}, LE = {};
+
+function sigColor(r) {
+  return r > -50 ? '#00ffe5' : r > -70 ? '#ffb300' : '#ff3a5c';
+}
+
+function typeColor(t) {
+  return t === 'wifi' ? '#2196ff' : '#b47aff';
+}
+
+function bars(r) {
+  const n = Math.round(Math.min(100, Math.max(0, ((r + 100) / 70) * 100)) / 20);
+  let h = '';
+  for (let i = 1; i <= 5; i++)
+    h += `<div class="dbr" style="height:${i*2+3}px;background:${i<=n?sigColor(r):'rgba(0,255,229,0.08)'};"></div>`;
+  return h;
+}
+
+function getAngle(id) {
+  if (!(id in A)) A[id] = Math.random() * Math.PI * 2;
+  return A[id];
+}
+
+function plotDist(r) {
+  return 16 + Math.min(Math.max((-r - 30) / 65, 0), 1) * mr * 0.9;
+}
+
+function renderNodes(data) {
+  const seen = new Set();
+  data.forEach(v => {
+    const id = v.id;
+    seen.add(id);
+    const d = plotDist(v.rssi);
+    const ag = getAngle(id);
+    const x = cx + d * Math.cos(ag);
+    const y = cy + d * Math.sin(ag);
+    const c = sigColor(v.rssi);
+    const t = typeColor(v.type);
+    const typeLabel = v.type === 'wifi' ? 'WiFi' : 'BLE';
+
+    if (!(id in NE)) {
+      const n = document.createElement('div');
+      n.className = 'nd';
+      n.style.pointerEvents = 'all';
+      n.style.cursor = 'pointer';
+      n.innerHTML = `
+        <div class="nc" style="width:8px;height:8px;background:${c};box-shadow:0 0 10px ${c},0 0 20px ${c}44;"></div>
+        <div class="nr" style="width:8px;height:8px;border-color:${c};"></div>`;
+      nl.appendChild(n);
+
+      const l = document.createElement('div');
+      l.className = 'lb';
+      l.innerHTML = `<div class="lb-badge" style="color:${t};border-color:${t}44;background:${t}11;">${typeLabel}</div>`;
+      nl.appendChild(l);
+
+      // tap handler — show popup
+      const handler = (e) => {
+        e.stopPropagation();
+        showPopup(v, x, y, c);
+      };
+      n.addEventListener('click', handler);
+      n.addEventListener('touchstart', handler, {passive:true});
+
+      NE[id] = n;
+      LE[id] = l;
+      NE[id]._data = v;
+    } else {
+      NE[id]._data = v; // keep fresh
+      NE[id].querySelector('.nc').style.background = c;
+      NE[id].querySelector('.nc').style.boxShadow = `0 0 10px ${c},0 0 20px ${c}44`;
+    }
+
+    NE[id].style.left = x + 'px';
+    NE[id].style.top = y + 'px';
+    LE[id].style.left = x + 'px';
+    LE[id].style.top = y + 'px';
+  });
+
+  Object.keys(NE).forEach(id => {
+    if (!seen.has(id)) {
+      NE[id].remove(); LE[id].remove();
+      delete NE[id]; delete LE[id]; delete A[id];
+    }
+  });
+}
+
+// ─── POPUP ───
+let popupTimeout = null;
+const popup = document.getElementById('nd-popup');
+
+function pBars(r, c) {
+  const n = Math.round(Math.min(100, Math.max(0, ((r + 100) / 70) * 100)) / 20);
+  let h = '';
+  for (let i = 1; i <= 5; i++)
+    h += `<div class="p-br" style="height:${i*2+3}px;background:${i<=n?c:'rgba(0,255,229,0.1)'};"></div>`;
+  return h;
+}
+
+function showPopup(v, x, y, c) {
+  clearTimeout(popupTimeout);
+  document.getElementById('pp-type').textContent = v.type === 'wifi' ? 'WI-FI' : 'BLUETOOTH LE';
+  document.getElementById('pp-type').style.color = typeColor(v.type);
+  document.getElementById('pp-name').textContent = v.name;
+  document.getElementById('pp-rssi').textContent = v.rssi + ' dBm';
+  document.getElementById('pp-rssi').style.color = c;
+  document.getElementById('pp-bar').innerHTML = pBars(v.rssi, c);
+  popup.style.left = x + 'px';
+  popup.style.top = y + 'px';
+  popup.style.borderColor = c + '44';
+  popup.style.boxShadow = `0 0 20px ${c}22, 0 8px 32px rgba(0,0,0,0.6)`;
+  popup.classList.add('visible');
+  popupTimeout = setTimeout(() => popup.classList.remove('visible'), 3500);
+}
+
+// tap anywhere else = dismiss
+nl.addEventListener('click', () => {
+  clearTimeout(popupTimeout);
+  popup.classList.remove('visible');
+});
+document.getElementById('ra').addEventListener('click', (e) => {
+  if (e.target === nl || e.target === cv) {
+    clearTimeout(popupTimeout);
+    popup.classList.remove('visible');
+  }
+});
+
+function renderList(data) {
+  document.getElementById('st').textContent = data.length;
+  document.getElementById('sw').textContent = data.filter(d => d.type === 'wifi').length;
+  document.getElementById('sb2').textContent = data.filter(d => d.type === 'ble').length;
+  document.getElementById('ss').textContent = data.filter(d => d.rssi > -60).length;
+  document.getElementById('of').style.display = data.length ? 'none' : 'block';
+
+  const dw = document.getElementById('dw');
+  if (!data.length) {
+    dw.innerHTML = '<div id="em" style="padding:30px;text-align:center;font-size:9px;letter-spacing:2px;color:var(--tx-dim);">NO SIGNALS DETECTED</div>';
+    return;
+  }
+
+  dw.innerHTML = '';
+  [...data].sort((a, b) => b.rssi - a.rssi).forEach((v, i) => {
+    const c = sigColor(v.rssi);
+    const el = document.createElement('div');
+    el.className = 'dr';
+    el.style.animationDelay = i * 40 + 'ms';
+    el.innerHTML = `
+      <div class="di">${v.type==='wifi'?'ᯤ':'ᛒ'}</div>
+      <div class="dn">
+        <div class="dnm">${v.name}</div>
+        <div class="dtp">${v.type==='wifi'?'WI-FI 802.11':'BLUETOOTH LE'}</div>
+      </div>
+      <div class="dr-r">
+        <div class="db">${bars(v.rssi)}</div>
+        <div class="dv" style="color:${c};">${v.rssi} dBm</div>
+      </div>`;
+    // accent line
+    el.querySelector('.dr') && null;
+    el.style.borderLeft = `2px solid ${c}22`;
+    dw.appendChild(el);
+  });
+
+  // Flash effect on new scan
+  const flash = document.createElement('div');
+  flash.className = 'scan-flash';
+  nl.appendChild(flash);
+  setTimeout(() => flash.remove(), 600);
+}
+
+let pct = 0;
+
+async function scan() {
+  try {
+    const data = await fetch('/scan').then(r => r.json());
+    renderNodes(data);
+    renderList(data);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+function tick() {
+  pct += 2;
+  if (pct > 100) { pct = 0; scan(); }
+  document.getElementById('sp-fl').style.width = pct + '%';
+  document.getElementById('sp-cd').textContent = Math.max(0, 5 - Math.round(pct / 20)) + 's';
+}
+
+function clk(){
+
+  const now = new Date();
+
+  const t = now.toLocaleTimeString([],{
+    hour:'2-digit',
+    minute:'2-digit',
+    second:'2-digit',
+    hour12:false
+  });
+
+  document.getElementById('ck').textContent = t;
+}
+
+async function getLocation(){
+
+  if(!navigator.geolocation) return;
+
+  navigator.geolocation.getCurrentPosition(
+
+    async(pos)=>{
+
+      const lat = pos.coords.latitude.toFixed(2);
+      const lon = pos.coords.longitude.toFixed(2);
+
+      const loc = document.createElement('div');
+
+      loc.className = 'pill';
+
+      loc.innerHTML = `
+        <div class="dot"></div>
+        LAT ${lat}° • LON ${lon}°
+      `;
+
+      document.getElementById('tb-r').prepend(loc);
+
+    },
+
+    ()=>{}
+  );
+}
+
+getLocation();
+
+rsz();
+scan();
+setInterval(tick, 100);
+setInterval(clk, 1000);
+clk();
+
+</script>
+</html>
