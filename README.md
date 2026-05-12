@@ -61,7 +61,6 @@ AETHER // SPECTRUM visualizes nearby Wi-Fi and BLE signals using a futuristic ra
 * Gzip Compression
 
 ---
----
 
 # 📱 Performance Notes
 
@@ -92,72 +91,3 @@ This project does NOT:
 Geolocation is optional and processed locally inside the browser.
 
 ---
-
-# 📸 Screenshots
-
-Add screenshots here:
-
-```text
-/screenshots/radar-ui.png
-/screenshots/mobile-view.png
-```
-
----
-
-# 📝 Suggested Repository Description
-
-```text
-A cinematic radar-style wireless telemetry dashboard for ESP32 featuring real-time Wi-Fi/BLE visualization and futuristic embedded UI.
-```
-
----
-
-# 📄 .gitignore
-
-```gitignore
-# Python
-__pycache__/
-*.pyc
-
-# macOS
-.DS_Store
-
-# Arduino
-build/
-
-# VS Code
-.vscode/
-
-# PlatformIO
-.pio/
-
-# Temporary
-*.tmp
-```
-
----
-
-# 📜 License
-
-MIT License recommended.
-
----
-
-# 👨‍💻 Credits
-
-Designed and developed by Jesrin Celas.
-
-Inspired by:
-
-* Aerospace telemetry systems
-* Military radar interfaces
-* Sci-fi HUD aesthetics
-* Embedded visualization dashboards
-
----
-
-# ⭐ Support
-
-If you like the project, consider starring the repository.
-
-It helps the project reach more embedded developers and makers.
